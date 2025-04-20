@@ -1,0 +1,14 @@
+{
+  "service": {
+    "name": "mysql",
+    "tags": ["database"],
+    "port": 3306,
+    "check": {
+      "id": "mysql-health-check",
+      "name": "MySQL TCP Health Check",
+      "tcp": "mysql-container:3306",
+      "interval": "10s",
+      "timeout": "1s"
+    }
+  }
+}

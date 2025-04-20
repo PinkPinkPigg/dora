@@ -13,6 +13,7 @@ type Instance interface {
 	execute() error //执行任务
 	stop() error
 	getId() (string, error) //终止当前任务
+	recall(gen.InstanceStatus, error)
 }
 
 type PythonInstance struct {
@@ -21,6 +22,11 @@ type PythonInstance struct {
 	ctx               context.Context
 	cancelFunc        context.CancelFunc
 	pythonInterpreter string
+	recallFunc        func(ctx context.Context, id string, status gen.InstanceStatus, err error)
+}
+
+func (p *PythonInstance) recall(status gen.InstanceStatus, err error) {
+	p.recallFunc(p.ctx, p.Id, status, err)
 }
 
 func (p *PythonInstance) execute() error {
@@ -60,6 +66,7 @@ type ShellInstance struct {
 	Id         string
 	ctx        context.Context
 	cancelFunc context.CancelFunc
+	recallFunc func(ctx context.Context, id string, status gen.InstanceStatus, err error)
 }
 
 func (s *ShellInstance) execute() error {
@@ -95,13 +102,16 @@ func (s *ShellInstance) getId() (string, error) {
 	return s.Id, nil
 }
 
-// 通过task生成instance
+func (s *ShellInstance) recall(status gen.InstanceStatus, err error) {
+	s.recallFunc(s.ctx, s.Id, status, err)
+}
 
-func NewInstance(ctx context.Context, request *gen.ExecuteInstanceRequest) (Instance, error) {
+// 通过task生成instance
+func NewInstance(request *gen.ExecuteInstanceRequest, recallFunc func(ctx context.Context, id string, status gen.InstanceStatus, err error)) (Instance, error) {
 	//获取实例id
 	id := kits.GetInstanceID(request.Task.Id, int32(request.Task.Frequency), request.ScheduleTimestamp)
 	//继承上级来的context，生成子context用于接受信号
-	myCtx, cancel := context.WithCancel(ctx)
+	myCtx, cancel := context.WithCancel(context.Background())
 	switch request.Task.Type {
 	case 0:
 		//生成python instance
@@ -111,6 +121,7 @@ func NewInstance(ctx context.Context, request *gen.ExecuteInstanceRequest) (Inst
 			ctx:               myCtx,
 			cancelFunc:        cancel,
 			pythonInterpreter: "python3",
+			recallFunc:        recallFunc,
 		}
 		return result, nil
 	case 1:
@@ -120,6 +131,7 @@ func NewInstance(ctx context.Context, request *gen.ExecuteInstanceRequest) (Inst
 			Id:         id,
 			ctx:        myCtx,
 			cancelFunc: cancel,
+			recallFunc: recallFunc,
 		}
 		return result, nil
 	default:

@@ -1,0 +1,8 @@
+CREATE TABLE instances (
+    auto_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY, -- 自增主键
+    id VARCHAR(255) NOT NULL UNIQUE,                   -- 人为传入的唯一标识符
+    create_timestamp BIGINT NOT NULL,                  -- 创建时间
+    modify_timestamp BIGINT NOT NULL,                  -- 修改时间
+    execute_time INT NOT NULL,                         -- 执行次数
+    status TINYINT NOT NULL                            -- 实例当前状态
+);

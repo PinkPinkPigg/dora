@@ -222,11 +222,11 @@ func (InstanceStatus) EnumDescriptor() ([]byte, []int) {
 
 type InstanceBase struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                   //实例唯一id
-	CreateTimestamp uint64                 `protobuf:"varint,2,opt,name=create_timestamp,json=createTimestamp,proto3" json:"create_timestamp,omitempty"` //创建时间
-	ModifyTimestamp uint64                 `protobuf:"varint,3,opt,name=modify_timestamp,json=modifyTimestamp,proto3" json:"modify_timestamp,omitempty"` //修改时间
-	ExecuteTime     uint32                 `protobuf:"varint,4,opt,name=execute_time,json=executeTime,proto3" json:"execute_time,omitempty"`             //执行次数
-	Status          InstanceStatus         `protobuf:"varint,5,opt,name=status,proto3,enum=executor.InstanceStatus" json:"status,omitempty"`             //实例当前状态
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" gorm:"column:id"`                                                   //实例唯一id
+	CreateTimestamp uint64                 `protobuf:"varint,2,opt,name=create_timestamp,json=createTimestamp,proto3" json:"create_timestamp,omitempty" gorm:"column:create_timestamp"` //创建时间
+	ModifyTimestamp uint64                 `protobuf:"varint,3,opt,name=modify_timestamp,json=modifyTimestamp,proto3" json:"modify_timestamp,omitempty" gorm:"column:modify_timestamp"` //修改时间
+	ExecuteTime     uint32                 `protobuf:"varint,4,opt,name=execute_time,json=executeTime,proto3" json:"execute_time,omitempty" gorm:"column:execute_time"`             //执行次数
+	Status          InstanceStatus         `protobuf:"varint,5,opt,name=status,proto3,enum=executor.InstanceStatus" json:"status,omitempty" gorm:"column:status"`             //实例当前状态
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }

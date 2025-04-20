@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 func RunPythonScript(ctx context.Context, scriptPath string, logFileName string, logDir string, pythonInterpreter string, args ...string) error {
@@ -21,7 +22,7 @@ func RunPythonScript(ctx context.Context, scriptPath string, logFileName string,
 	}
 
 	// 构造日志文件路径
-	logFilePath := filepath.Join(logDir, logFileName)
+	logFilePath := filepath.Join(logDir, time.Now().String()+"_"+logFileName)
 
 	// 打开日志文件（追加模式）
 	logFile, err := os.OpenFile(logFilePath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)

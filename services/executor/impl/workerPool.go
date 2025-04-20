@@ -2,7 +2,11 @@ package impl
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/PinkPinkPigg/dora/services/executor/gen"
+	"github.com/infraboard/mcube/logger"
+	"github.com/infraboard/mcube/logger/zap"
 	"sync"
 )
 
@@ -12,6 +16,7 @@ type WorkerPool struct {
 	instanceMap   *sync.Map       //实例map
 	ctx           context.Context //协程池ctx
 	cancelFunc    context.CancelFunc
+	l             logger.Logger
 }
 
 func NewWorkerPool(maxWorkerNum int) *WorkerPool {
@@ -24,13 +29,21 @@ func NewWorkerPool(maxWorkerNum int) *WorkerPool {
 		instanceMap:   &sync.Map{},
 		ctx:           cancel,
 		cancelFunc:    cancelFunc,
+		l:             zap.L().Named("workerPool"),
 	}
 }
 
 func (p *WorkerPool) submitInstance(task Instance) error {
-	//	todo:提交任务到channel，同时将任务已提交状态写入mysql数据库,并返回error
-	p.taskChan <- task
-	return nil
+	select {
+	case <-p.ctx.Done():
+		//	线程池关闭，无法继续写入任务
+		//作为taskChan的写入方，关闭channel
+		close(p.taskChan)
+		return context.Canceled
+	case p.taskChan <- task:
+		task.recall(gen.InstanceStatus_WAITING_TO_SUBMIT, nil)
+		return nil
+	}
 }
 
 func (p *WorkerPool) ExecuteInstance(task Instance) {
@@ -39,29 +52,38 @@ func (p *WorkerPool) ExecuteInstance(task Instance) {
 		return
 	}
 	//	任务不为空,加入信号量，如果队列已满将阻塞，如果不满将可以继续加入
-	p.semaphoreChan <- struct{}{}
+	select {
+	case <-p.ctx.Done():
+		close(p.semaphoreChan)
+		p.l.Info("semaphore channel closed")
+		return
+	default:
+		//正常来说，直接写入信号量
+		p.semaphoreChan <- struct{}{}
+		defer func() { <-p.semaphoreChan }() //结束后要把信号量拿出来
+	}
 	//通过map记录id->实例映
 	instanceId, err := task.getId()
 	if err != nil {
 		return
 	}
 	p.instanceMap.Store(instanceId, task)
-
 	defer func() {
-		<-p.semaphoreChan
 		p.instanceMap.Delete(instanceId)
 	}() //执行结束后要取出1个信号量并去掉map内的对应key
-
-	//	todo:任务执行中状态写入mysql数据库
 	//任务的执行看ServiceImpl的调用ctx,这里有点是如果线程池在这里被终止，这个任务会继续执行下去，因为
 	//task的执行仅看ServiceImpl的调用ctx
+	//任务回调，将运行中状态写入mysql
+	task.recall(gen.InstanceStatus_EXECUTING, nil)
 	err = task.execute()
 	if err != nil {
-		//	todo：任务执行失败写入数据库
+		//	任务失败，回调失败
+		if !errors.Is(err, context.Canceled) {
+			task.recall(gen.InstanceStatus_FAIL, nil)
+		}
 		return
 	}
-
-	//	todo：任务执行成功写入数据库
+	task.recall(gen.InstanceStatus_SUCCESS, nil)
 }
 
 func (p *WorkerPool) CancelInstance(ctx context.Context, instanceId string) error {
@@ -77,9 +99,9 @@ func (p *WorkerPool) CancelInstance(ctx context.Context, instanceId string) erro
 	newInstance := instance.(Instance)
 	_ = newInstance.stop() //传输信号一般理论不会失败
 	p.instanceMap.Delete(instanceId)
-	//todo:mysqy写入主动终止该实例,需要上游的ctx
+	//回调取消
+	newInstance.recall(gen.InstanceStatus_CANCEL, nil)
 	return nil
-
 }
 
 func (p *WorkerPool) manageInstances() {
@@ -87,9 +109,14 @@ func (p *WorkerPool) manageInstances() {
 		select {
 		case <-p.ctx.Done():
 			//线程池退出
-			fmt.Println("workerPool exit")
+			p.l.Infof("workerPool exit")
 			return
-		case task := <-p.taskChan:
+
+		case task, ok := <-p.taskChan:
+			if !ok {
+				p.l.Infof("task channel closed")
+				return
+			}
 			//此时成功取得任务
 			go p.ExecuteInstance(task)
 		}
@@ -99,14 +126,14 @@ func (p *WorkerPool) manageInstances() {
 
 func (p *WorkerPool) Start() {
 	go p.manageInstances()
-	fmt.Println("workerPool start")
+	p.l.Infof("workerPool start")
 }
 
 func (p *WorkerPool) Stop() {
 	p.cancelFunc() //停止线程池后，线程池将停止接收处理任务
 	//停止协程队列和信号量
-	close(p.taskChan)
-	close(p.semaphoreChan)
+	//close(p.taskChan)
+	//close(p.semaphoreChan)
 	//处理掉当前map里仍然存在的instance id，把仍然存在的instance 取消掉
 	background := context.Background()
 	p.instanceMap.Range(func(key, _ interface{}) bool {
@@ -114,5 +141,5 @@ func (p *WorkerPool) Stop() {
 		_ = p.CancelInstance(background, key.(string)) //由于是线程池本身的stop操作，p.context已经被done了，这里手动取消instance则随便传一个
 		return true
 	})
-	fmt.Println("workerPool stop")
+	p.l.Infof("workerPool stop")
 }

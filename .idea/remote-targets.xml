@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <option name="projectDefaultTargetUuid" value="cd7bda22-f5de-423f-8303-f097e2ae52a7" />
+    <targets>
+      <target name="ubuntu@119.91.33.239:22" type="ssh/sftp" uuid="cd7bda22-f5de-423f-8303-f097e2ae52a7">
+        <config>
+          <option name="projectRootOnTarget" value="/home/ubuntu/dora" />
+          <option name="serverName" value="ubuntu@119.91.33.239:22 key" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goRoot" value="/usr/softwares/go/bin/go" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

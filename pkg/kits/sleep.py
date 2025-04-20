@@ -2,7 +2,6 @@ import sys
 import time
 
 if __name__ == "__main__":
-    print("Hello, World!")
-    print(f"Arguments: {sys.argv[1:]}")
-    time.sleep(5)
+    print("Sleep py task!!!! sleep 100s")
+    time.sleep(1000)
     print("Hello, World! 5s later and this task finished")

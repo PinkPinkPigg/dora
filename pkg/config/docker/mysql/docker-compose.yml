@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  mysql:
+    image: mysql:8.0.33  # 指定 MySQL 的稳定版本
+    container_name: mysql-container  # 容器名称
+    restart: always  # 容器意外停止时自动重启
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: lyc
+      MYSQL_PASSWORD: lyc
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql  # 将 MySQL 数据存储到主机的卷中，确保数据持久化
+      - /projects/dora/configs/mysql/my.cnf:/etc/mysql/my.cnf
+
+volumes:
+  mysql_data:
+    driver: local  # 使用本地卷驱动

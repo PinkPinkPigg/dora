@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  consul:
+    image: consul:1.15.3
+    container_name: consul-server
+    ports:
+      - "8500:8500"   # 映射 Consul Web UI 的端口
+      - "8600:8600"   # 映射 DNS 端口
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0  # 自动绑定到主机的网络接口
+    command: agent -server -bootstrap -ui -client=0.0.0.0
+    volumes:
+      - /projects/dora/data/docker/consul-server:/consul/data  # 持久化 Consul 数据
+      - /projects/dora/configs/consul:/consul/config  # 挂载自定义配置文件

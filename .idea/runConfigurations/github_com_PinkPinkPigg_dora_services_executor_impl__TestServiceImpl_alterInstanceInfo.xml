@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="github.com/PinkPinkPigg/dora/services/executor/impl 中的 TestServiceImpl_alterInstanceInfo" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+    <module name="dora" />
+    <target name="ubuntu@119.91.33.239:22" />
+    <working_directory value="$PROJECT_DIR$/services/executor/impl" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="amd64" />
+    </envs>
+    <root_directory value="$PROJECT_DIR$/services/executor" />
+    <kind value="PACKAGE" />
+    <package value="github.com/PinkPinkPigg/dora/services/executor/impl" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <pattern value="^\QTestServiceImpl_alterInstanceInfo\E$" />
+    <method v="2" />
+  </configuration>
+</component>
