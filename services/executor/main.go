@@ -21,13 +21,13 @@ func main() {
 	//注册服务
 	gen.RegisterExecutorServiceServer(grpcServer, impl.GetExecutorService())
 	//	for测试
-	listen, err := net.Listen("tcp", "localhost:50051")
+	listen, err := net.Listen("tcp", "0.0.0.0:50052")
 	if err != nil {
 		zap.L().Named("MAIN").Fatalf("failed to listen: %v", err)
 	}
 	err = grpcServer.Serve(listen)
 
-	zap.L().Named("MAIN").Info("gRPC server is running on port 50051...")
+	zap.L().Named("MAIN").Info("gRPC server is running on port 50052...")
 	if err != nil {
 		zap.L().Named("MAIN").Fatalf("Failed to serve: %v", err)
 	}
