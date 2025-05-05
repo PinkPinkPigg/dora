@@ -33,7 +33,7 @@ func NewMysql() *Mysql {
 		MaxIdleConn: 10,
 		MaxLifetime: 600,
 		l:           sync.Mutex{},
-		Host:        "127.0.0.1",
+		Host:        "mysql-container",
 		Port:        "3306",
 		UserName:    "lyc",
 		Password:    "lyc",
