@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package scheduler;
+
+option go_package = "/dora/services/scheduler";
+
+import "executor.proto";
+
+
+service SchedulerService {
+  rpc AddTask(AddTaskRequest) returns (AddTaskRespond);
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskRespond);
+  rpc GetAllTaskInScheduler(GetAllTaskInSchedulerRequest) returns (GetAllTaskInSchedulerRespond);
+
+}
+
+message AddTaskRequest{
+  executor.TaskBase task = 1; //任务基础信息
+}
+
+message AddTaskRespond{
+  int32 status = 1;//是否成功执行
+  map<string,string> extra = 2; //额外信息map
+}
+
+message DeleteTaskRequest{
+  executor.TaskBase task = 1; //任务基础信息
+}
+
+message DeleteTaskRespond{
+  int32 status = 1;//是否成功执行
+  map<string,string> extra = 2; //额外信息map
+}
+
+message GetAllTaskInSchedulerRequest{
+}
+
+message GetAllTaskInSchedulerRespond{
+    repeated uint64 task_id_list = 1;
+}
+
+
+

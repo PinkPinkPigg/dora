@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package task;
+
+option go_package = "/dora/services/task";
+
+import "executor.proto";
+
+
+service TaskService{
+  rpc NewTask(NewTaskRequest) returns (NewTaskRespond);
+  rpc GetTask(GetTaskRequest) returns(GetTaskRespond);
+  rpc AlterTaskStatus(AlterTaskStatusRequest) returns(AlterTaskStatusRespond);
+  rpc AlterTaskFrequency(AlterTaskFrequencyRequest) returns(AlterTaskFrequencyRespond);
+  rpc AlterTaskScriptPath(AlterTaskScriptPathRequest) returns(AlterTaskScriptPathRespond);
+  rpc AlterTaskDescription(AlterTaskDescriptionRequest) returns(AlterTaskDescriptionRespond);
+  rpc DeleteTask(DeleteTaskRequest)returns(DeleteTaskRespond);
+}
+
+message NewTaskRequest{
+  executor.TaskBase task = 1; //任务基础信息
+}
+
+message NewTaskRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
+
+message GetTaskRequest{
+    uint64 task_id = 1;
+}
+
+message GetTaskRespond{
+  executor.TaskBase task= 1;
+}
+
+message AlterTaskStatusRequest{
+  uint64 task_id = 1;
+  executor.TaskStatus status = 2;
+}
+
+message AlterTaskStatusRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
+
+message AlterTaskFrequencyRequest{
+  uint64 task_id = 1;
+  executor.TaskFrequency frequency = 2;
+}
+
+message AlterTaskFrequencyRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
+
+message AlterTaskScriptPathRequest{
+  uint64 task_id = 1;
+  string script_path = 2;
+}
+
+message AlterTaskScriptPathRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
+
+message AlterTaskDescriptionRequest{
+  uint64 task_id = 1;
+  string description = 2;
+}
+
+message AlterTaskDescriptionRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
+
+message DeleteTaskRequest{
+  uint64 task_id = 1;
+}
+
+message DeleteTaskRespond{
+  int32 status = 1;
+  map<string,string> extra = 2; //额外信息map
+}
