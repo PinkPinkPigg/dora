@@ -19,6 +19,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	//注册服务
+	impl.GetExecutorService()
 	gen.RegisterExecutorServiceServer(grpcServer, impl.GetExecutorService())
 	//	for测试
 	listen, err := net.Listen("tcp", "localhost:50051")

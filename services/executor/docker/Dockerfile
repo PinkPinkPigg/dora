@@ -4,6 +4,8 @@ FROM golang:1.23.8 AS builder
 # 设置工作目录
 WORKDIR /workspace
 
+ENV GOPROXY=https://goproxy.cn,direct
+
 # 将整个工作区复制到容器中
 COPY /projects/dora/code/dora .
 

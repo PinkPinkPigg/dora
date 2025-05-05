@@ -14,7 +14,7 @@ import (
 
 type ServiceImpl struct {
 	//继承UnimplementedExecutorServiceServer，同时实现方法
-	gen.UnimplementedExecutorServiceServer
+	*gen.UnimplementedExecutorServiceServer
 	WorkerPool *WorkerPool //	执行任务线程池
 	db         *gorm.DB
 	l          logger.Logger
@@ -39,7 +39,7 @@ func init() {
 	//https://github.com/PinkPinkPigg/DouSheng/blob/main/dou_kit/conf/load.go 代码学习
 
 	ExecutorService = &ServiceImpl{
-		UnimplementedExecutorServiceServer: gen.UnimplementedExecutorServiceServer{},
+		UnimplementedExecutorServiceServer: &gen.UnimplementedExecutorServiceServer{},
 		WorkerPool:                         NewWorkerPool(500), //暂时写死线程池大小
 		l:                                  zap.L().Named("executor service"),
 	}

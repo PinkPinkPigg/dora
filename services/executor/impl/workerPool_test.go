@@ -21,9 +21,11 @@ var PythonTask1 = &gen.TaskBase{
 	Description:     "this is a test py instance",
 	CreateTimestamp: 0,
 	ModifyTimestamp: 0,
-	ScriptPath:      "/projects/dora/scripts/py3/test_py3.py",
+	ScriptPath:      "/test_scripts/py3/test_py3.py",
 	RetryConfig:     nil,
 }
+
+//docker run -d --name executor_service -v /projects/dora/scripts:/test_scripts executor-service-image:latest
 
 var PythonTask2 = &gen.TaskBase{
 	Id:              200,
@@ -34,7 +36,7 @@ var PythonTask2 = &gen.TaskBase{
 	Description:     "this is a test py instance",
 	CreateTimestamp: 0,
 	ModifyTimestamp: 0,
-	ScriptPath:      "/projects/dora/scripts/py3/sleep.py",
+	ScriptPath:      "/test_scripts/py3/sleep.py",
 	RetryConfig:     nil,
 }
 

@@ -21,9 +21,10 @@ func TestServiceImpl_GetInstanceInfo(t *testing.T) {
 
 func TestServiceImpl_ExecuteInstance(t *testing.T) {
 
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("127.0.0.1:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect to gRPC server: %v", err)
+		return
 	}
 	defer conn.Close()
 
@@ -35,17 +36,32 @@ func TestServiceImpl_ExecuteInstance(t *testing.T) {
 		Force:             false,
 	})
 
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
+
 	_, err = client.ExecuteInstance(myctx, &gen.ExecuteInstanceRequest{
 		Task:              PythonTask2,
 		ScheduleTimestamp: 1000,
 		Force:             false,
 	})
 
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
+
 	_, err = client.ExecuteInstance(myctx, &gen.ExecuteInstanceRequest{
 		Task:              PythonTask2,
 		ScheduleTimestamp: 8000,
 		Force:             false,
 	})
+
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
 
 	_, err = client.ExecuteInstance(myctx, &gen.ExecuteInstanceRequest{
 		Task:              PythonTask2,
@@ -63,6 +79,7 @@ func TestServiceImpl_ExecuteInstance(t *testing.T) {
 	//}
 	if err != nil {
 		fmt.Print(err.Error())
+		return
 	}
 
 	_, err = client.CancelInstance(myctx, &gen.CancelInstanceRequest{
@@ -70,11 +87,21 @@ func TestServiceImpl_ExecuteInstance(t *testing.T) {
 		ScheduleTimestamp: 900,
 	})
 
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
+
 	time.Sleep(200 * time.Second)
 
 	_, err = client.CancelInstance(myctx, &gen.CancelInstanceRequest{
 		Task:              PythonTask2,
 		ScheduleTimestamp: 1000,
 	})
+
+	if err != nil {
+		fmt.Print(err.Error())
+		return
+	}
 
 }

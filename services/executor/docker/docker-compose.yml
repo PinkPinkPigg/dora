@@ -1,0 +1,15 @@
+services:
+  executor_service:
+    image: executor-service-image:latest
+    container_name: executor-server
+    ports:
+      - "50052:50052"
+    volumes:
+      - /projects/dora/scripts:/test_scripts
+    networks:
+      - dora_network
+
+
+networks:
+  dora_network:
+    external: true
